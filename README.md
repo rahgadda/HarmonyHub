@@ -3,7 +3,7 @@
 ## Overview
 - This is a Visual API Orchestrator POC created for Rest API Calls.
 - UI Generates YAML. Written in static HTML using WebComponents. 
-- Python-based' CLI' is used to run YAML generated from UI. It can sequence and execute API Calls.
+- Python-based `CLI` is used to run YAML generated from UI. It can sequence and execute API Calls.
 
 ## Commands
 - harmonyhub init <<workflow.yaml>>
