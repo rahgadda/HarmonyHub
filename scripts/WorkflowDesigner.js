@@ -710,6 +710,9 @@ export class WorkflowDesigner {
                     if (prop.datatype =='ArrayObject'){
                         step[prop.field] = prop.value[0];
                     }
+                    else if(prop.datatype == 'Object'){  
+                        step[prop.field] = Object.assign({}, ...prop.value);
+                    }
                     else if(prop.field.includes('.')) {
                         const [root, subField] = prop.field.split('.');
                         step[root] = step[root] || {};
