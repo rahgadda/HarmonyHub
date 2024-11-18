@@ -7,7 +7,7 @@
 
 ## Commands
 - harmonyhub init
-  - harmonyhub init <<workflow.yaml>>
+  - harmonyhub init --file workflow.yaml
 - harmonyhub run <<workflow.yaml>>
   - pyyaml2apiworkflow run <<workflow.yaml>> --debug
 - harmonyhub --help
