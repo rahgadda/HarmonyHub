@@ -6,8 +6,8 @@
 - Python-based `CLI` is used to run YAML generated from UI. It can sequence and execute API Calls.
 
 ## Commands
-- harmonyhub init <<workflow.yaml>>
-  - harmonyhub init <<workflow.yaml>> -n <<workflow>> -d "My Workflow Description"
+- harmonyhub init
+  - harmonyhub init <<workflow.yaml>>
 - harmonyhub run <<workflow.yaml>>
   - pyyaml2apiworkflow run <<workflow.yaml>> --debug
 - harmonyhub --help
