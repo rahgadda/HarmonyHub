@@ -1,0 +1,79 @@
+
+metadata:
+---------
+{
+    "name": "PetStore",
+    "description": "Swagger PetStore"
+}
+
+variables:
+----------
+{
+    "url": "petstore.swagger.io/v2/pet"
+}
+
+headers:
+--------
+{
+  "Accept": "application/json"
+}
+
+name: Add Pet
+http.url: https://$url
+http.method: POST
+
+headers:
+--------
+{
+    "Content-Type": "application/json"
+}
+
+data:
+-----
+{
+    "id": 0,
+    "category": {
+    "id": 0,
+    "name": "string"
+    },
+    "name": "doggie",
+    "photoUrls": [
+    "string"
+    ],
+    "tags": [
+    {
+        "id": 0,
+        "name": "string"
+    }
+    ],
+    "status": "available"
+}
+
+output:
+-------
+{
+    "pet_id": ".response.id",
+    "tag_0": ".request.tags[0].id"
+}
+
+print:
+------
+$http_status,
+$url,
+$pet_id,
+$response,
+
+tests:
+------
+[
+    {
+        "name": "Validate Pet ID Status",
+        "condition": "$pet_id > 0",
+        "onFailure": "continue"
+    },
+    {
+        "name": "Validate Http Status",
+        "condition": "$http_status == 200",
+        "onFailure": "exit"
+    }
+]

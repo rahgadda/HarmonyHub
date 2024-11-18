@@ -1,0 +1,11 @@
+/* .yaml-view, .yaml-code{
+    height: 100%;
+} */
+
+.CodeMirror-line-like, .CodeMirror-hscrollbar, .CodeMirror-vscrollbar{
+    display: none !important;
+}
+
+pre {
+    margin: 0.5em 0px !important;
+}

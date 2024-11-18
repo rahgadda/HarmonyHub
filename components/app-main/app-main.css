@@ -1,0 +1,89 @@
+.app-main{
+  display: flex;
+  align-items: stretch;
+}
+
+app-tools, app-properties{
+  border: 1px solid var(--primary-color); 
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.main-block{
+  flex-grow: 1;
+  border: 1px solid var(--primary-color);
+  overflow: hidden;
+  padding: 1rem;
+}
+
+/* Hide app-tools and app-properties on hamburger-toggle */
+app-tools.hidden, app-properties.hidden {
+  flex: 0 0 0;
+  width: 0;
+  opacity: 0;
+  visibility: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.app-main-header{
+  padding-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+app-canvas{
+  display: block; /* Default visible */  
+  height: 100%;
+}
+
+app-canvas.hidden {
+  display: none;
+}
+
+app-yaml {
+  height: 100%;
+  display: none; /* Default hidden */
+}
+
+app-yaml.visible {
+  display: block;
+}
+
+.app-main-viewer{
+  width: 100%;
+  height: 100%;
+}
+
+.left-btn-group{
+  display: flex;
+}
+
+.right-btn-group{
+  display: flex;
+  margin-left: auto;
+}
+
+button {
+  background-color: var(--primary-color); 
+  border: 1px solid var(--text-color);
+  color: var(--secondary-color); 
+  padding: 10px 24px;
+  cursor: pointer;
+  float: left;
+}
+
+button:not(:last-child) {
+  border-right: none; 
+}
+
+button:after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+button:hover {
+  background-color: rgb(21, 21, 21);
+}
