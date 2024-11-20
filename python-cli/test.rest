@@ -1,0 +1,13 @@
+### Test YAML Workflow Processing
+POST http://localhost:9087/run
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="your_workflow.yaml"
+Content-Type: application/x-yaml
+
+< ./workflow.yaml
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Health Check
+GET http://localhost:9087/
