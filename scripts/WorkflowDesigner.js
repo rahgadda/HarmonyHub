@@ -93,6 +93,14 @@ export class Node {
                         value: null,
                     },
                     {
+                        name: 'Type',
+                        field: 'type',
+                        datatype: 'Text',
+                        required: true,
+                        hint: 'Enter Node Type rest, decision, loop, rest-decision, rest-loop',
+                        value: null,
+                    },
+                    {
                         name: 'Headers',
                         field: 'headers',
                         datatype: 'Object',
@@ -109,16 +117,16 @@ export class Node {
                         value: null,
                     },
                     {
-                        name: 'Output',
-                        field: 'output',
+                        name: 'Outputs',
+                        field: 'outputs',
                         datatype: 'Object',
                         required: false,
                         hint: 'Enter Output {}',
                         value: {}
                     },
                     {
-                        name: 'Print',
-                        field: 'print',
+                        name: 'Prints',
+                        field: 'prints',
                         datatype: 'Array',
                         required: false,
                         hint: 'Enter Print []',
