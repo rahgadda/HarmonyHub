@@ -65,7 +65,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // Run Button Events Handling
     document.addEventListener('run-click', (event) => {
         console.log('Run button clicked');
-        // Handle workflow execution
+    
+        // Calling python harmony-cli
+        const yamlInput = window.yamlString;
+        try {
+                // Parse YAML input from textarea
+                const yamlObject = jsyaml.load(yamlInput);
+                
+                processYamlWorkflow(yamlObject)
+                .then(result => {
+                    console.log(JSON.stringify(result, null, 2));
+                })
+                .catch(error => {
+                    console.error(error.message);
+                });
+
+            } catch (e) {
+                document.getElementById('result').textContent = 
+                    `YAML parsing error: ${e.message}`;
+            }
     });
 
     // Add Yaml/Canvas Resize
@@ -87,3 +105,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 })
+
+async function processYamlWorkflow(yamlObject) {
+    try {
+        // Convert YAML object to string
+        const yamlString = jsyaml.dump(yamlObject);
+        
+        // Create blob from YAML string
+        const yamlBlob = new Blob([yamlString], { type: 'application/x-yaml' });
+        
+        // Create form data
+        const formData = new FormData();
+        formData.append('file', yamlBlob, 'workflow.yaml');
+
+        // Make the fetch call
+        const response = await fetch('http://localhost:9087/run', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        return result;
+    } catch (error) {
+        console.error('Error processing workflow:', error);
+        throw error;
+    }
+}
