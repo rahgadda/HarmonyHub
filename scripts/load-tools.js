@@ -1,7 +1,7 @@
 
 const toolFiles = {
-  'Basic Shapes': '../tools/basic-shapes.yaml',
-  'Integrations': '../tools/integrations.yaml'
+  'Basic Shapes': 'https://rahulkirangaddam.is-a.dev/HarmonyHub/tools/basic-shapes.yaml',
+  'Integrations': 'https://rahulkirangaddam.is-a.dev/HarmonyHub/tools/integrations.yaml'
 };
 
 export async function loadTools() {
