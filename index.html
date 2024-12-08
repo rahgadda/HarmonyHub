@@ -4,31 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HarmonyHub</title>
-    <link rel="stylesheet" href="./css/styles.css">
-    <script src="./scripts/main.js"></script>
-    <script src="./scripts/load-components.js" type="module"></script>
     
-    <!-- Fabric JS -->
+    <!-- Dependencies -->
+    <!-- 1. Fabric.js -->
     <script src="https://cdn.jsdelivr.net/npm/fabric@latest/dist/index.min.js"></script>
-
-    <!-- js-yaml -->
+    <!-- 2. js-yaml -->
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-
-    <!-- Code Mirror -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/yaml/yaml.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    
+    <!-- HarmonyHub -->
+    <link rel="stylesheet" href="./style/main.css">
+    <script src="./scripts/load-components.js"></script>
+    <script src="./scripts/main.js"></script>
 </head>
 <body>
-    <article>
-        <app-header>
-            <p slot="header-text" class="header-text" id="headerText">
-                HarmonyHub
-            </p>
-        </app-header>
-        <app-main></app-main>
-        <app-footer></app-footer>
-    </article>
+    <!-- HarmonyHub -->
+    <hmh-main></hmh-main>
 </body>
 </html>
