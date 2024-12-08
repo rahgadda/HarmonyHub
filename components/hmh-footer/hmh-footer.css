@@ -1,0 +1,143 @@
+#console-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: none;
+    flex-direction: column;
+    max-height: 300px;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 2000; /* Higher than tools/properties z-index */
+    background-color: rgba(255, 255, 255, 0.98); /* Semi-transparent background */
+}
+
+#console-header {
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#console-logger {
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    background-color: rgba(249, 249, 249, 0.95);
+    max-height: 200px;
+    overflow-y: auto;
+    font-size: 12px;
+    flex-grow: 1;
+}
+
+.log-entry {
+    margin: 5px;
+    padding: 5px;
+    border-radius: 3px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.log-entry.log {
+    background-color: #e6f2ff;
+    color: #0066cc;
+}
+
+.log-entry.warn {
+    background-color: #fff2e6;
+    color: #ff9900;
+}
+
+.log-entry.error {
+    background-color: #ffe6e6;
+    color: #ff0000;
+}
+
+.console-btn {
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+    margin-left: 5px;
+}
+
+#close-btn {
+    background-color: #f44336;
+}
+
+#clear-btn {
+    background-color: #2196F3;
+}
+
+#log-counts {
+    display: flex;
+    gap: 10px;
+}
+
+.count-badge {
+    background-color: #2196F3;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 10px;
+}
+
+#show-console-btn {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    z-index: 2000;
+}
+
+.log-content {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 5px;
+}
+
+.log-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.message {
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.object-preview {
+    background: #f5f5f5;
+    padding: 8px;
+    border-radius: 4px;
+    margin: 5px 0;
+    max-height: 300px;
+    overflow: auto;
+    font-size: 12px;
+}
+
+.error-details {
+    color: #ff0000;
+    padding: 5px;
+}
+
+.error-message {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.error-stack {
+    font-family: monospace;
+    font-size: 11px;
+    color: #666;
+    margin: 5px 0;
+    padding: 5px;
+    background: #fff;
+    border-radius: 3px;
+    white-space: pre-wrap;
+}

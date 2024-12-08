@@ -1,0 +1,16 @@
+<button id="show-console-btn" class="console-btn" onclick="this.getRootNode().host.showConsole()">Show Console</button>
+
+<div id="console-container">
+    <div id="console-header">
+        <div id="log-counts">
+            <span class="count-badge" id="log-count">Logs: 0</span>
+            <span class="count-badge" id="warn-count">Warns: 0</span>
+            <span class="count-badge" id="error-count">Errors: 0</span>
+        </div>
+        <div>
+            <button id="clear-btn" class="console-btn" onclick="this.getRootNode().host.clearLogs()">Clear Logs</button>
+            <button id="close-btn" class="console-btn" onclick="this.getRootNode().host.closeConsole()">Close</button>
+        </div>
+    </div>
+    <div id="console-logger"></div>
+</div>

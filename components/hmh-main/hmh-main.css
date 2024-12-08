@@ -1,0 +1,89 @@
+.hmh-main{
+    display: flex;
+    height: 100%;
+    position: relative;
+}
+
+hmh-canvas-container {
+    flex-grow: 1;
+    position: relative;
+}
+
+p{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+}
+
+hmh-hamburger{
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    z-index: 1000;
+}
+
+hmh-tools{
+    position: absolute;
+    top: 100px;
+    left: 30px;
+    width: 250px;
+    height: calc(100% - 200px);
+    background-color: var(--tools-props-bg-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px var(--tools-props-shadow-color);
+    padding: 15px;
+    z-index: 1000;
+    max-height: calc(100% - 100px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: thin;
+    scrollbar-color: white white;
+}
+
+hmh-properties{
+    position: absolute;
+    top: 100px;
+    right: 30px;
+    width: 250px;
+    height: calc(100% - 200px);
+    background-color: var(--tools-props-bg-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px var(--tools-props-shadow-color);
+    padding: 15px;
+    z-index: 1000;
+    max-height: calc(100% - 100px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: thin;
+    scrollbar-color: white white;
+}
+
+hmh-tools.hidden, hmh-properties.hidden {
+    flex: 0 0 0;
+    width: 0;
+    opacity: 0;
+    visibility: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+#saveMessage {
+    position: absolute;
+    top: 7%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(76, 175, 80, 0.9);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 5px;
+    display: none;
+    z-index: 10;
+    text-align: center;
+}

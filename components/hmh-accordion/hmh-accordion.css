@@ -1,0 +1,89 @@
+.container {
+    margin: 0 auto;
+    width: 100%; /* Full width */
+}
+
+.accordion {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+    width: 100%; /* Full width */
+}
+
+.accordion-header {
+    background: white;
+    padding: 15px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+}
+
+.accordion-header:hover {
+    background: white;
+}
+
+.header-title {
+    flex-grow: 1;
+}
+
+.item-count {
+    background: white;
+    color: #4f46e5;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 14px;
+    margin-right: 12px;
+    min-width: 28px;
+    text-align: center;
+}
+
+.accordion-content {
+    display: none;
+    padding: 10px;
+}
+
+.accordion-content.active {
+    display: block;
+}
+
+.grid-container {
+    display: grid; /* Change to grid */
+    grid-template-columns: repeat(2, 1fr); /* Two columns */
+    gap: 10px;
+    padding: 5px;
+    background: white;
+}
+
+.grid-item {
+    width: 100%; /* Full width of grid cell */
+    flex: none; /* Remove flex */
+    padding-top: 10px;
+    text-align: center;
+    background: white;
+    transition: transform 0.2s;
+}
+
+.grid-item:hover {
+    transform: translateY(-2px);
+}
+
+.grid-item svg {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 5px;
+}
+
+.grid-item p {
+    color: #333;
+    font-size: 14px;
+}
+
+.arrow {
+    transition: transform 0.3s;
+}
+
+.accordion-header.active .arrow {
+    transform: rotate(180deg);
+}

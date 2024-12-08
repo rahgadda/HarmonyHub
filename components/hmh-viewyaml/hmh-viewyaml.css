@@ -1,0 +1,100 @@
+:host {
+    display: block;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+#hmhViewYaml {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    overflow: auto;
+}
+
+#popupContent {
+    background: white;
+    width: 90%;
+    max-width: 800px;
+    margin: 50px auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+#yamlViewContainer {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    max-height: 500px;
+    overflow: auto;
+}
+
+#lineNumbers, #yamlDisplay {
+    font-family: 'Courier New', monospace;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+#lineNumbers {
+    background-color: #f0f0f0;
+    padding: 15px 10px;
+    text-align: right;
+    user-select: none;
+    color: #888;
+    border-right: 1px solid #ddd;
+    margin: 0;
+    white-space: nowrap;
+}
+
+#yamlDisplay {
+    flex-grow: 1;
+    padding: 15px;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    margin: 0;
+    background-color: white;
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #eee;
+}
+
+.popup-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    transition: transform 0.2s;
+}
+
+.icon-button:hover {
+    transform: scale(1.1);
+}
+
+.icon-button svg {
+    width: 24px;
+    height: 24px;
+}
+
+#copyMessage {
+    color: green;
+    margin-left: 10px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
