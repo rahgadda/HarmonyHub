@@ -26,7 +26,7 @@ export class Edge {
             }
         ];
 
-        if (this.startNode.type === 'decision') {
+        if (this.startNode.type === 'switch') {
             properties.push({
                 name: 'Expression',
                 field: 'expression',
