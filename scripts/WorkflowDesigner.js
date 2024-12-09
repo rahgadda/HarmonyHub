@@ -292,7 +292,9 @@ export class WorkflowDesigner {
         };
 
         const yaml = jsyaml.dump(yamlObject);
-        const yamlWithCorrectedKeys = yaml.replace(/- loop:/g, '  loop:').replace(/- switch:/g, '  switch:');
+        const yamlWithCorrectedKeys = yaml.replace(/- loop:/g, '  loop:')
+                                          .replace(/- switch:/g, '  switch:')
+                                          .replace(/- condition:(.*)/g, '  condition:$1');
         
         console.log(yamlWithCorrectedKeys);  
         return yamlWithCorrectedKeys;
@@ -317,10 +319,15 @@ export class WorkflowDesigner {
                 if (node.edges) {
                     node.edges.forEach(edge => {
                         const caseName = "case-"+edge.endNode.getPropertyValue('id') || 'default';
+                        
                         if (node === edge.endNode) {
                             return;
                         }
+
+                        console.log("Edge Case: ",edge.getPropertyValue('expression'));
                         cases[caseName] = this.printNodeEdges(edge.endNode, [], visitedNodes);
+                        cases[caseName].push({'condition': edge.getPropertyValue('expression')});
+
                     });
                 }
                 steps.push({'switch': cases});
@@ -332,10 +339,11 @@ export class WorkflowDesigner {
                         const loopName = "loop-"+edge.endNode.getPropertyValue('id') || 'default';
                         if (node === edge.endNode) {
                             return;
-                        }else{
-                            loop[loopName] = []
-                        } 
+                        }
+
+                        console.log("Edge Loop: ",edge.getPropertyValue('expression'));
                         loop[loopName] = this.printNodeEdges(edge.endNode, [], visitedNodes);
+                        loop[loopName].push({'condition': edge.getPropertyValue('expression')});
                     });
                 }
                 steps.push({'loop':loop});
