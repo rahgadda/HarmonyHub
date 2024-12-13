@@ -87,3 +87,17 @@ hmh-tools.hidden, hmh-properties.hidden {
     z-index: 10;
     text-align: center;
 }
+
+#errorMessage {
+    position: absolute;
+    top: 7%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: red;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 5px;
+    display: none;
+    z-index: 10;
+    text-align: center;
+}

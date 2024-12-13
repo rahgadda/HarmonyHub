@@ -26,6 +26,10 @@ export class Node {
 
         // Track Edges
         this.edges = [];
+
+        // Only for Integrations
+        this.headers = {};
+        this.workflow = null;
     }
 
     initializeProperties(properties) {
@@ -171,6 +175,7 @@ export class Node {
                         
                         workflowDesigner.connectionState.startNode.addEdge(edge);
                         endNode.addEdge(edge);
+                        // console.log('Start Nodes Edges:', workflowDesigner.connectionState.startNode.edges);
                     }
 
                     // Always clean up temp line

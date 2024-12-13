@@ -29,15 +29,31 @@ class HMHCanvas extends BaseComponent {
 
             try {
                 // Convert SVG string to path data
-                const svg = e.detail.tool.svg;               
-                this.workflowDesigner.addNodeToCanvas(
-                    centerX - centerX/3,
-                    130,
-                    e.detail.tool.description,
-                    e.detail.tool.type,
-                    svg,
-                    e.detail.tool.properties
-                );
+                const svg = e.detail.tool.svg;
+                
+                if (e.detail.tool.type !== "harmonyhub-integration"){
+                    this.workflowDesigner.addNodeToCanvas(
+                        centerX - centerX/3,
+                        130,
+                        e.detail.tool.description,
+                        e.detail.tool.type,
+                        svg,
+                        e.detail.tool.properties
+                    );
+                }else{
+                    this.workflowDesigner.addIntegrationNodeToCanvas(
+                        centerX - centerX/3,
+                        130,
+                        e.detail.tool.description,
+                        e.detail.tool.type,
+                        svg,
+                        e.detail.tool.properties,
+                        e.detail.tool.headers,
+                        e.detail.tool.workflow
+                    );
+                }
+
+                // console.log('Node added:', e.detail.tool.description);
             } catch (error) {
                 console.error('Error adding node:', error);
             }   

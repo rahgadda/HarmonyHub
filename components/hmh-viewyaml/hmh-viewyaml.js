@@ -3,6 +3,7 @@ import { BaseComponent } from '../base/base.js';
 class HMHViewYaml extends BaseComponent {
     constructor() {
         super('hmh-viewyaml');
+        this.yaml = '';
     }
 
     async connectedCallback() {
@@ -14,6 +15,7 @@ class HMHViewYaml extends BaseComponent {
         // YAML show event
         document.addEventListener('show-yaml', (e) => {
             if (e.detail?.yaml) {
+                this.yaml = e.detail.yaml;
                 this.displayYaml(shadowRoot, e.detail.yaml);
             }
         });
@@ -23,6 +25,7 @@ class HMHViewYaml extends BaseComponent {
         const popupOverlay = shadowRoot.getElementById('hmhViewYaml');
         const copyButton = shadowRoot.getElementById('copyButton');
         const downloadButton = shadowRoot.getElementById('downloadButton');
+        const exportButton = shadowRoot.getElementById('exportButton');
         const runButton = shadowRoot.getElementById('runButton');
         const closePopup = shadowRoot.getElementById('closePopup');
         const copyMessage = shadowRoot.getElementById('copyMessage');
@@ -50,9 +53,82 @@ class HMHViewYaml extends BaseComponent {
             URL.revokeObjectURL(url);
         });
 
+        // Export functionality
+        exportButton.addEventListener('click', () => {
+            // console.log('Yaml:', this.yaml);
+            let yamlObject = jsyaml.load(this.yaml);
+           
+            let exportYamlObject = {};
+
+            console.log(yamlObject.variables);
+
+            let objectName = yamlObject.name.charAt(0).toUpperCase() + yamlObject.name.slice(1);
+
+            exportYamlObject[objectName + "Tool"] = {
+                id: 0,
+                type: "harmonyhub-integration",
+                description: yamlObject.description,
+                svg: yamlObject.svg,
+                category: "Integration",
+                properties: [{
+                    name: 'Name',
+                    field: 'name',
+                    datatype: 'Text',
+                    required: true,
+                    hint: 'Enter value for Name',
+                    value: yamlObject.description,
+                    readOnly: false
+                }]
+            };
+
+            if (yamlObject.headers) {
+                exportYamlObject[objectName + "Tool"].properties.push({
+                    name: 'Headers',
+                    field: 'headers',
+                    datatype: 'Object',
+                    required: false,
+                    hint: 'Enter '+objectName+' Headers {}',
+                    value: yamlObject.headers,
+                    readOnly: false
+                });
+            }
+
+            if (yamlObject.variables) {
+                exportYamlObject[objectName + "Tool"].properties.push({
+                    name: 'Variables',
+                    field: 'variables',
+                    datatype: 'Object',
+                    required: false,
+                    hint: 'Enter '+objectName+' Variables {}',
+                    value: yamlObject.variables,
+                    readOnly: false
+                });
+            }
+
+            exportYamlObject[objectName + "Tool"].properties.push({
+                name: 'Steps',
+                field: 'steps',
+                datatype: 'ArrayObject',
+                required: true,
+                hint: 'Enter '+objectName+' for Steps',
+                value: yamlObject.workflow.steps,
+                readOnly: false 
+            });
+
+            console.log(jsyaml.dump(exportYamlObject));
+
+            const blob = new Blob([jsyaml.dump(exportYamlObject)], {type: 'text/yaml'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = yamlObject.name.charAt(0).toUpperCase() + yamlObject.name.slice(1) + "Tool"+'.yaml';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
         // Run functionality (placeholder)
         runButton.addEventListener('click', () => {
-            alert('Run functionality not implemented. You can customize this based on your specific YAML processing needs.');
+            console.log('TBD: Run functionality');
         });
 
         // Close popup

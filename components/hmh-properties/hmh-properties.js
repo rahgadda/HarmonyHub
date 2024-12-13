@@ -107,6 +107,11 @@ class HMHProperties extends BaseComponent {
                 <h4>Tool Properties</h3>
                 `;
                 break;
+            case 'integration':
+                this.propertiesContent.innerHTML = `
+                <h4>Integration Properties</h3>
+                `;
+                break;
             case 'canvas':
                 this.propertiesContent.innerHTML = `
                 <h4>Workflow Properties</h4>
@@ -125,10 +130,8 @@ class HMHProperties extends BaseComponent {
 
 
 
-        object.properties.forEach(property => {
-            
+        object.properties.forEach(property => {            
             // console.log('Property '+property.name+' is getting loaded as '+property.value);
-            
             switch (property.datatype) {
                 case 'Text':
                     this.propertiesContent.innerHTML += this.createTextInput(property.name, property.value, property.hint, property.readOnly);
@@ -170,43 +173,51 @@ class HMHProperties extends BaseComponent {
             const inputElement = this.propertiesContent.querySelector(`[data-property-name="${property.name}"]`);
 
             // console.log('Property '+property.name+' is getting saved as '+inputElement.value);
-
+            
             if (inputElement.value === '' && property.required) {
                 console.error('Required property '+property.name+' is null');
-                window.alert('Required property '+property.name+' is null');
+                // window.alert('Required property '+property.name+' is null');
+                
+                document.dispatchEvent(new CustomEvent('display-error-message', {
+                    detail: { message: 'Required property ' + property.name + ' is null' }
+                }));
             }
             else if (!(inputElement.value === '')) {
                 // console.log('Property '+property.name+' is getting saved as '+inputElement.value);
                 switch (property.datatype) {
                     case 'Text':
-                        property.value = inputElement.value;
+                        property.value = String.raw`${inputElement.value}`;
                         break;
                     case 'TextLarge':
-                        property.value = inputElement.value;
+                        property.value = String.raw`${inputElement.value}`;
                         break;
                     case 'Enumeration':
                         property.value = inputElement.value;
                         break;
                     case 'Array':
-                        property.value = inputElement.value.split(',\n');
+                        property.value = String.raw`${inputElement.value}`.split(',\n');
                         break;
                     case 'Object':
                         try {
-                            property.value = JSON.parse(inputElement.value);
+                            property.value = JSON.parse(String.raw`${inputElement.value}`);
+                            // console.log('Object property '+property.name+' is getting saved as '+property.value.a);
                         } catch (error) {
-                            console.error('Invalid JSON in property', property.name);
-                            window.alert('Invalid JSON property '+property.name);
+                            document.dispatchEvent(new CustomEvent('display-error-message', {
+                                detail: { message: 'Invalid JSON in property '+property.name }
+                            }));
                         }
+                        break;
                     case 'ArrayObject':
                         try {
-                            const arrayObject = Array(inputElement.value)
+                            const arrayObject = Array(String.raw`${inputElement.value}`)
                             property.value = arrayObject.map(element => {
                                 return JSON.parse(element);
                             });
                             //console.log('ArrayObject property '+property.name+' is getting saved as '+property.value.forEach(element => console.log(element)));
                         } catch (error) {
-                            console.error('Invalid JSON in property', property.name);
-                            window.alert('Invalid JSON property '+property.name);
+                            document.dispatchEvent(new CustomEvent('display-error-message', {
+                                detail: { message: 'Invalid JSON in property '+property.name }
+                            }));
                         }
                         break;
                     default:
@@ -220,6 +231,7 @@ class HMHProperties extends BaseComponent {
                 const newText = object.getPropertyValue('name')
                 object.text.set('text', newText);
                 object.text.set('backgroundColor',newText=== '' ?'#4CAF50':'#8EBAFD');
+                object.addNewProperty();
                 window.workflowDesigner.fabricCanvas.renderAll();
                 break;
             case 'node':
@@ -240,6 +252,7 @@ class HMHProperties extends BaseComponent {
     }
 
     createTextArea(label, value, hint, readOnly = false) {
+        // console.log('Property '+label+' is getting loaded as '+value);
         return `
             <div class="property">
                 <label>${label}</label>

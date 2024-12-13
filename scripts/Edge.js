@@ -63,6 +63,29 @@ export class Edge {
         // console.log("Updated Properties", this.properties);
     }
 
+    addNewProperty() {
+        // Check if property already exists
+        //console.log(`Adding new property for catch ${this.startNode.type} ${this.getPropertyValue("name")}`);
+        if (this.startNode.type === 'errorhandler' && this.getPropertyValue("name") === 'catch') {
+            const expPropertyExists = this.properties.find(p => p.field === 'expression');
+            if (!expPropertyExists) {
+                this.properties.push({
+                    name: 'Expression',
+                    field: 'expression',
+                    datatype: 'Text',
+                    required: true,
+                    hint: 'Enter Error Message Code',
+                    value: "",
+                });
+            }
+        }
+        else if (this.startNode.type === 'error' && this.getPropertyValue("name") !== 'catch') {
+            const expPropertyExists = this.properties.find(p => p.field === 'expression');
+            if (expPropertyExists) {
+                this.properties = this.properties.filter(p => p.field !== 'expression');
+            }
+        }
+    }
 
     createEdge(fabricCanvas) {
         // Get connection points
@@ -132,6 +155,9 @@ export class Edge {
             edge: this,
             data: { type: 'edge', id: this.id }
         });
+
+        // Add dynamic properties
+        this.addNewProperty();
 
         // Attach events
         this.attachGroupEvents(fabricCanvas);

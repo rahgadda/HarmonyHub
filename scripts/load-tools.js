@@ -21,7 +21,9 @@ export async function loadTools() {
           description: config.description,
           svg: config.svg,
           category: config.category,
-          properties: config.properties
+          properties: config.properties,
+          headers: config.type === "harmonyhub-integration" ? config.headers : null,
+          workflow: config.type === "harmonyhub-integration" ? config.workflow : null
         });
       }
     } catch (error) {

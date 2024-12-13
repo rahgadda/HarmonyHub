@@ -59,6 +59,50 @@ export class WorkflowDesigner {
                 hint: 'Workflow Type',
                 value: 'harmonyhub-workflow',
                 readOnly: true
+            },
+            {
+                name: 'Name',
+                field: 'name',
+                datatype: 'Text',
+                required: true,
+                hint: 'Workflow Name',
+                value: 'demo',
+                readOnly: false
+            },
+            {
+                name: 'Description',
+                field: 'description',
+                datatype: 'Text',
+                required: true,
+                hint: 'Workflow Description',
+                value: 'Demo Workflow',
+                readOnly: false
+            },
+            {
+                name: 'SVG Icon',
+                field: 'svg',
+                datatype: 'TextLarge',
+                required: false,
+                hint: 'SVG Icon',
+                value: '',
+                readOnly: false
+            },
+            {
+                name: 'Headers',
+                field: 'headers',
+                datatype: 'Object',
+                required: false,
+                hint: 'Enter Global Headers {}',
+                value: {},
+                readOnly: false
+            },
+            {
+                name: 'Variables',
+                field: 'variables',
+                datatype: 'Object',
+                required: false,
+                hint: 'Enter Global Variables {}',
+                value: {}
             }
         ]
 
@@ -94,23 +138,12 @@ export class WorkflowDesigner {
 
             // Create Node object        
             const node = new Node(x, y, name, type, clonedProperties);
+            let icon = null;
+            let text = null;
 
             // Create icon using Path
-            const icon = this.createFabricPathFromSVG(svg);
-
-            // Create text element
-            node.text = new fabric.Text(name, {
-                fontSize: 14,
-                fill: '#000000',
-                originX: 'center',
-                originY: 'center',
-                left: node.width / 2 - 40,
-                top: icon.height * icon.scaleY + 20,
-                selectable: false,
-                evented: false,
-                hasBorders: false,
-                hasControls: false
-            });
+            [icon,text] = this.createFabricPathFromSVG(svg, name, node);
+            node.text = text;
     
             // Create group containing icon and text
             const group = new fabric.Group([icon, node.text], {
@@ -131,6 +164,8 @@ export class WorkflowDesigner {
             node.group = group;
             this.nodes.push(node);
             
+            // console.log("Node added:", node.getPropertyValue('name'));
+
             // Attach event handlers
             this.attachNodeEventHandlers(group);
             
@@ -145,6 +180,24 @@ export class WorkflowDesigner {
         }
     }
 
+    addIntegrationNodeToCanvas(x, y, name, type, svg, properties, headers, workflow) {
+        try{
+            let node = this.addNodeToCanvas(x, y, name, type, svg, properties)
+
+            node.group.customType = 'integration';
+            node.headers = headers;
+            node.workflow = workflow;
+
+            console.log("Integration Node added:", node);
+
+            return node;
+        }
+        catch (error) {
+            console.error('Error in addIntegrationNodeToCanvas:', error);
+            throw error;
+        }
+    }
+
     updateNodeText(node, text) {
         if (node && node.group) {
             const textElement = node.group.item(1);
@@ -155,10 +208,12 @@ export class WorkflowDesigner {
 
     // Helper method
     // 1. Create Fabric Path Object from SVG
-    createFabricPathFromSVG(svgTag) {
+    createFabricPathFromSVG(svgTag, name, node) {
         try {
             const parser = new DOMParser();
             const svgDoc = parser.parseFromString(svgTag, "image/svg+xml");
+            let fabricText = null;
+            let fabricIcon = null;
     
             if (!svgDoc || !svgDoc.documentElement) {
                 console.error("Failed to parse SVG string:", svgTag);
@@ -166,52 +221,91 @@ export class WorkflowDesigner {
             }
     
             const svgElement = svgDoc.documentElement;
-            // Try both direct path and nested path queries
-            let pathElement = svgElement.querySelector('path');
-            
-            if (!pathElement && svgElement.tagName.toLowerCase() === 'path') {
-                // Handle case where the SVG element itself is a path
-                pathElement = svgElement;
-            }
+            const pathElement = svgElement.querySelector('path');
+            const textElement = svgElement.querySelector('text');
     
-            if (!pathElement) {
-                console.error("No path element found in SVG:", svgTag);
-                throw new Error("SVG does not contain a path element");
-            }
+            // Handle text element
+            if (textElement) {
+                const text = textElement.textContent;
+                const fontSize = textElement.getAttribute('font-size') || 10;
+                const fontWeight = textElement.getAttribute('font-weight') || 'normal';
+                const fill = textElement.getAttribute('fill') === 'currentColor' ? '#ffffff' : (textElement.getAttribute('fill') || '#ffffff');
     
-            // Extract path data
-            const pathData = pathElement.getAttribute('d');
-            if (!pathData) {
-                throw new Error("Path element has no 'd' attribute");
-            }
-    
-            // Extract fill color, defaulting to white if currentColor
-            const fill = pathElement.getAttribute('fill') === 'currentColor' ? '#ffffff' : (pathElement.getAttribute('fill') || '#ffffff');
-    
-            // Extract stroke color, defaulting to black if currentColor
-            const stroke = pathElement.getAttribute('stroke') === 'currentColor' ? '#000000' : (pathElement.getAttribute('stroke') || '#000000');
+                fabricIcon = new fabric.Text(text, {
+                    fontSize: parseInt(fontSize),
+                    fontWeight: fontWeight,
+                    fill: fill,
+                    originX: 'center',
+                    originY: 'center',
+                    scaleX: 2,
+                    scaleY: 2
+                });
 
-            // Extract stroke width
-            const strokeWidth = pathElement.getAttribute('stroke-width') || 1;
+                fabricText = new fabric.Text(name, {
+                    fontSize: 14,
+                    fill: '#000000',
+                    originX: 'center',
+                    originY: 'center',
+                    left: node.width / 2 - 40,
+                    top: fabricIcon.height * fabricIcon.scaleY-40,
+                    selectable: false,
+                    evented: false,
+                    hasBorders: false,
+                    hasControls: false
+                });
 
-            // Create fabric path with options
-            return new fabric.Path(pathData, {
-                fill: fill,
-                stroke: stroke,
-                strokeWidth: strokeWidth,
-                scaleX: 2,
-                scaleY: 2,
-                originX: 'center',
-                originY: 'center'
-            });
+                return [fabricIcon,fabricText];
+            }
+    
+            // Handle path element
+            if (pathElement || svgElement.tagName.toLowerCase() === 'path') {
+                const element = pathElement || svgElement;
+                const pathData = element.getAttribute('d');
+                
+                if (!pathData) {
+                    throw new Error("Path element has no 'd' attribute");
+                }
+    
+                const fill = element.getAttribute('fill') === 'currentColor' ? '#ffffff' : (element.getAttribute('fill') || '#ffffff');
+                const stroke = element.getAttribute('stroke') === 'currentColor' ? '#000000' : (element.getAttribute('stroke') || '#000000');
+                const strokeWidth = element.getAttribute('stroke-width') || 1;
+    
+                fabricIcon = new fabric.Path(pathData, {
+                    fill: fill,
+                    stroke: stroke,
+                    strokeWidth: strokeWidth,
+                    scaleX: 2,
+                    scaleY: 2,
+                    originX: 'center',
+                    originY: 'center'
+                });
+
+                fabricText = new fabric.Text(name, {
+                    fontSize: 14,
+                    fill: '#000000',
+                    originX: 'center',
+                    originY: 'center',
+                    left: node.width / 2 - 40,
+                    top: fabricIcon.height * fabricIcon.scaleY + 20,
+                    selectable: false,
+                    evented: false,
+                    hasBorders: false,
+                    hasControls: false
+                });
+
+                return [fabricIcon,fabricText];
+            }
+    
+            throw new Error("SVG contains neither path nor text element");
     
         } catch (error) {
-            console.error('Error creating fabric path:', error);
-            // Return a simple default path as fallback
-            return new fabric.Path('M 0 0 L 10 10', {
+            console.error('Error creating fabric object:', error);
+            // Return default text as fallback
+            return new fabric.Text('?', {
                 fill: '#ffffff',
-                stroke: '#ff0000',
-                strokeWidth: 2
+                fontSize: 20,
+                originX: 'center',
+                originY: 'center'
             });
         }
     }
@@ -227,7 +321,11 @@ export class WorkflowDesigner {
             
             // Remove connected edges
             if (this.selectedNode.edges) {
-                this.selectedNode.edges.forEach(edge => edge.deleteSelectedEdge(this.fabricCanvas));
+                // console.log("Edges: ", this.selectedNode.edges);
+                this.selectedNode.edges.forEach( edge => {
+                    // console.log("Edge: ", edge.endNode.getPropertyValue('id'));
+                    edge.deleteSelectedEdge(this.fabricCanvas)
+                });
             }
             
             // Remove from nodes array
@@ -267,11 +365,15 @@ export class WorkflowDesigner {
         });
 
         // Find the start node which is not an end node
-        startNode = this.nodes.find(node => {
-            const isStartNode = listAllEdges.some(edge => edge.startNode === node);
-            const isEndNode = listAllEdges.some(edge => edge.endNode === node);
-            return isStartNode && !isEndNode;
-        });
+        if (this.nodes.length === 1) {
+            startNode = this.nodes[0];
+        }else{
+            startNode = this.nodes.find(node => {
+                const isStartNode = listAllEdges.some(edge => edge.startNode === node);
+                const isEndNode = listAllEdges.some(edge => edge.endNode === node);
+                return isStartNode && !isEndNode;
+            });
+        }
 
         // console.log("Start Node", startNode);
 
@@ -280,21 +382,33 @@ export class WorkflowDesigner {
             steps = this.printNodeEdges(startNode,steps);
 
         }else{
-            console.error("No start node found");
+            throw new Error("No start node found");
         }  
 
         const yamlObject = {
             apiVersion: this.properties[0].value,
             kind: this.properties[1].value,
+            name: this.properties[2].value,
+            description: this.properties[3].value,
+            svg: this.properties[4].value ? String.raw`${this.properties[4].value}` : undefined,
+            headers: Object.keys(this.properties[5].value).length ? this.properties[5].value : undefined,
+            variables: Object.keys(this.properties[6].value).length ? this.properties[6].value : undefined,
             workflow: {
-                steps: steps
+            steps: steps
             }
         };
+            
+        for (let key in yamlObject) {
+            if (yamlObject[key] === undefined) {
+                delete yamlObject[key];
+            }
+        }
 
         const yaml = jsyaml.dump(yamlObject);
-        const yamlWithCorrectedKeys = yaml.replace(/- loop:/g, '  loop:')
-                                          .replace(/- switch:/g, '  switch:')
-                                          .replace(/- condition:(.*)/g, '  condition:$1');
+        const yamlWithCorrectedKeys = yaml.replace(/- iterations:/g, '  iterations:')
+                                          .replace(/- cases:/g, '  cases:')
+                                          .replace(/- errorhandler:/g, '  errorhandler:')
+                                        //   .replace(/- condition:(.*)/g, '  condition:$1');
         
         console.log(yamlWithCorrectedKeys);  
         return yamlWithCorrectedKeys;
@@ -306,70 +420,125 @@ export class WorkflowDesigner {
     
         visitedNodes.add(node);
         
-        // if (node.getPropertyValue('type') !== "switch" || node.getPropertyValue('type') !== "loop") {
-        //     // console.log("addYamlNode ",node.getPropertyValue('name'));
-        //     this.addYamlNode(node, steps);
-        // }
-            
         this.addYamlNode(node, steps);
-
+        
         switch(node.getPropertyValue('type')){
             case 'switch':
-                const cases = {};
+                const switchCases = [];
                 if (node.edges) {
                     node.edges.forEach(edge => {
-                        const caseName = "case-"+edge.endNode.getPropertyValue('id') || 'default';
+                        if (node === edge.endNode) return;
                         
-                        if (node === edge.endNode) {
-                            return;
+                        const caseSteps = [];
+                        this.printNodeEdges(edge.endNode, caseSteps, visitedNodes);
+                        const caseKey = {
+                            name:`case-${edge.endNode.getPropertyValue('id')}`,
+                            condition: edge.getPropertyValue('expression'),
+                            steps: caseSteps
+                        };
+                        
+                        if (caseSteps.length > 0) {
+                            if (edge.getPropertyValue('expression') === null || edge.getPropertyValue('expression') === '') {
+                                throw new Error(`Required field expression in the edge of Decision NodeID ${node.getPropertyValue("id")}`);
+                            } else {
+                                switchCases.push(caseKey);
+                            }
                         }
-
-                        console.log("Edge Case: ",edge.getPropertyValue('expression'));
-                        cases[caseName] = this.printNodeEdges(edge.endNode, [], visitedNodes);
-                        cases[caseName].push({'condition': edge.getPropertyValue('expression')});
-
                     });
                 }
-                steps.push({'switch': cases});
+                steps.push({'cases': switchCases});
                 break;
-            case 'loop':
-                const loop = {};
+            case 'errorhandler':
+                const errorBlocks = [];
+                let foundTryBlock = false;
+                let foundCatchBlock = false;
+
                 if (node.edges) {
                     node.edges.forEach(edge => {
-                        const loopName = "loop-"+edge.endNode.getPropertyValue('id') || 'default';
-                        if (node === edge.endNode) {
-                            return;
-                        }
+                        if (node === edge.endNode) return;
 
-                        console.log("Edge Loop: ",edge.getPropertyValue('expression'));
-                        loop[loopName] = this.printNodeEdges(edge.endNode, [], visitedNodes);
-                        loop[loopName].push({'condition': edge.getPropertyValue('expression')});
+                        const errorSteps = [];
+                        this.printNodeEdges(edge.endNode, errorSteps, visitedNodes);
+                        const errorKey = {
+                            name:edge.getPropertyValue('name'),
+                            condition: edge.getPropertyValue('name') === 'catch' ? edge.getPropertyValue('expression') : undefined,
+                            steps: errorSteps
+                        };
+
+                        if (errorSteps.length > 0) {
+
+                            if (edge.getPropertyValue('name') === 'try') {
+                                foundTryBlock = true;
+                            }
+                            if (edge.getPropertyValue('name') === 'catch') {
+                                foundCatchBlock = true;
+                            }
+
+                            if (edge.getPropertyValue('name') === null || edge.getPropertyValue('name') === '') {
+                                throw new Error(`Required field name in the edge of Error NodeID ${node.getPropertyValue("id")}`);
+                            } else {
+                                errorBlocks.push(errorKey);
+                            }
+                        }
                     });
                 }
-                steps.push({'loop':loop});
-                break;
+
+                if (!foundTryBlock) {
+                    throw new Error(`Error Handler block must have a try block in Error NodeID ${node.getPropertyValue("id")}`);
+                }
+                else if (!foundCatchBlock) {
+                    throw new Error(`Error Handler block must have a catch block in Error NodeID ${node.getPropertyValue("id")}`);
+                }
+                else{
+                    steps.push({'errorhandler': errorBlocks});
+                }
+                break;  
+            case 'loop':
+                const loopIteration = [];
+                if (node.edges) {
+                    node.edges.forEach(edge => {
+                        if (node === edge.endNode) return;
+                        
+                        const loopSteps = [];
+                        this.printNodeEdges(edge.endNode, loopSteps, visitedNodes);
+                        const iterationKey = {
+                            name:`iteration-${edge.endNode.getPropertyValue('id')}`,
+                            condition: edge.getPropertyValue('expression'),
+                            steps: loopSteps
+                        };
+                        
+                        if (loopSteps.length > 0) {
+                            if (edge.getPropertyValue('expression') === null || edge.getPropertyValue('expression') === '') {
+                                throw new Error(`Required field expression in the edge of Loop NodeID ${node.getPropertyValue("id")}`);
+                            } else {
+                                loopIteration.push(iterationKey);
+                            }
+                        }
+                    });
+                }
+                steps.push({'iterations': loopIteration});
+                break;   
             default:
                 node.edges.forEach(edge => {
                     this.printNodeEdges(edge.endNode, steps, visitedNodes);
                 });
                 break;
         }
-
+    
         return steps;
     }
 
-    addYamlNode(node, steps){
+    addYamlNode(node, steps) {
         const step = {};
-
-        // console.log("Processing Node - ",node.getPropertyValue('name'));
-
+    
         node.properties.forEach((prop) => {
             if(prop.value !== null && !(Array.isArray(prop.value) && prop.value.length === 0) && !(typeof prop.value === 'object' && Object.keys(prop.value).length === 0)){
-                if (prop.datatype =='ArrayObject'){
+                if (prop.datatype == 'ArrayObject'){
                     step[prop.field] = prop.value[0];
                 }
-                else if(prop.datatype == 'Object'){  
-                    step[prop.field] = Object.assign({}, ...prop.value);
+                else if(prop.datatype == 'Object'){
+                    // Fix: Direct assignment instead of spread
+                    step[prop.field] = prop.value;
                 }
                 else if(prop.field.includes('.')) {
                     const [root, subField] = prop.field.split('.');
@@ -380,14 +549,17 @@ export class WorkflowDesigner {
                     step[prop.field] = prop.value;
                 }
             }
-        })
-
+            else{
+                if (prop.required) {
+                    throw new Error(`Required field ${prop.name} is empty in NodeID ${node.getPropertyValue("id")}`);
+                }
+            }
+        });
         
         steps.push(step);
-
         return steps;
     }
-
+    
     // Event Handler
     // 1. Canvas Event Handlers
     attachCanvasEventHandlers() {
@@ -587,14 +759,21 @@ export class WorkflowDesigner {
             }
             else if (e.key === 's' && e.ctrlKey) {
                 e.preventDefault();
-                const yaml = this.generateYaml();
+                try {
+                    const yaml = this.generateYaml();
 
-                // console.log(yaml);
-                
-                // Dispatch event with YAML content
-                document.dispatchEvent(new CustomEvent('show-yaml', {
-                    detail: { yaml }
-                }));
+                    // console.log(yaml);
+                    
+                    // Dispatch event with YAML content
+                    document.dispatchEvent(new CustomEvent('show-yaml', {
+                        detail: { yaml }
+                    }));
+                } catch (error) {
+                    console.error(`Error generating YAML: ${error.message}`);
+                    document.dispatchEvent(new CustomEvent('display-error-message', {
+                        detail: { message: `Error generating YAML. ${error.message}` }
+                    }));
+                }
             }
             if(e.key === 'Escape' && this.connectionState.isConnecting) {
                 if (this.connectionState.tempLine) {

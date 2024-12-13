@@ -11,6 +11,7 @@ class HMHMain extends BaseComponent {
         const HMHTools = shadowRoot.querySelector('hmh-tools');
         const HMHProperties = shadowRoot.querySelector('hmh-properties');
         const saveMessage = shadowRoot.getElementById('saveMessage');
+        const errorMessage = shadowRoot.getElementById('errorMessage');
 
         //Add Event Listener
         // 1. Hamburger menu toggle event
@@ -19,7 +20,17 @@ class HMHMain extends BaseComponent {
             HMHProperties.classList.toggle('hidden');
         });
 
-        //Update properties
+        // 3. Populate Error
+        document.addEventListener('display-error-message', (event) => {
+            errorMessage.innerHTML = event.detail.message;
+            errorMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 2000);
+        });
+
+        // 3. Update properties
         HMHProperties.addEventListener('mouseout', () => {
             // console.log("Focus out");
 
