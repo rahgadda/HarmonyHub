@@ -6,13 +6,13 @@
 - Python-based `CLI` is used to run YAML generated from UI. It can sequence and execute API Calls.
 
 ## Commands
-- harmonyhub_cli init
-  - harmonyhub_cli init --file workflow.yaml
+- harmonyhub-cli init
+  - harmonyhub-cli init --file workflow.yaml
 - harmonyhub_cli run <<workflow.yaml>>
   - pyyaml2apiworkflow run <<workflow.yaml>> --debug
-- harmonyhub_cli server
-- harmonyhub_cli --help
-- harmonyhub_cli --version
+- harmonyhub-cli server
+- harmonyhub-cli --help
+- harmonyhub-cli --version
 
 ## Operator Supported
 - Simple comparisons (==, !=, >, <, >=, <=)
