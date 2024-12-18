@@ -1,0 +1,44 @@
+GroqTool:
+  id: 0
+  type: harmonyhub-workflow-integration
+  description: Groq
+  svg: >-
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+    fill="currentColor">
+      <text x="12" y="12" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="bold">
+        Groq
+      </text>
+    </svg>
+  category: Integration
+  headers:
+    Content-Type: application/json
+    Authorization: Bearer AddYourTokenHere
+  properties:
+    - name: Name
+      field: name
+      datatype: Text
+      required: true
+      hint: Enter value for name
+      value: Groq
+      readOnly: false
+    - name: Url
+      field: url
+      datatype: Text
+      required: true
+      hint: Enter value for url
+      value: https://api.groq.com/openai/v1/chat/completions
+      readOnly: false
+    - name: Model
+      field: model
+      datatype: Text
+      required: true
+      hint: Enter value for model
+      value: llama3-8b-8192
+      readOnly: false
+    - name: Question
+      field: question
+      datatype: Text
+      required: true
+      hint: Enter value for question
+      value: what are language models?
+      readOnly: false

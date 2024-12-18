@@ -186,20 +186,20 @@ class HMHProperties extends BaseComponent {
                 // console.log('Property '+property.name+' is getting saved as '+inputElement.value);
                 switch (property.datatype) {
                     case 'Text':
-                        property.value = inputElement.value;
+                        property.value = String.raw`${inputElement.value}`;
                         break;
                     case 'TextLarge':
-                        property.value = inputElement.value;
+                        property.value = String.raw`${inputElement.value}`;
                         break;
                     case 'Enumeration':
                         property.value = inputElement.value;
                         break;
                     case 'Array':
-                        property.value = inputElement.value.split(',\n');
+                        property.value = String.raw`${inputElement.value}`.split(',\n');
                         break;
                     case 'Object':
                         try {
-                            property.value = JSON.parse(inputElement.value);
+                            property.value = JSON.parse(String.raw`${inputElement.value}`);
                             // console.log('Object property '+property.name+' is getting saved as '+property.value.a);
                         } catch (error) {
                             document.dispatchEvent(new CustomEvent('display-error-message', {
@@ -209,7 +209,7 @@ class HMHProperties extends BaseComponent {
                         break;
                     case 'ArrayObject':
                         try {
-                            const arrayObject = Array(inputElement.value)
+                            const arrayObject = Array(String.raw`${inputElement.value}`)
                             property.value = arrayObject.map(element => {
                                 return JSON.parse(element);
                             });

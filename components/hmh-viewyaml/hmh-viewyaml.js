@@ -1,5 +1,35 @@
 import { BaseComponent } from '../base/base.js';
 
+async function processYamlWorkflow(yamlObject) {
+    try {
+        // Convert YAML object to string
+        const yamlString = jsyaml.dump(yamlObject);
+        
+        // Create blob from YAML string
+        const yamlBlob = new Blob([yamlString], { type: 'application/x-yaml' });
+        
+        // Create form data
+        const formData = new FormData();
+        formData.append('file', yamlBlob, 'workflow.yaml');
+
+        // Make the fetch call
+        const response = await fetch('http://localhost:9087/run', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        return result;
+    } catch (error) {
+        console.error('Error processing workflow:', error);
+        throw error;
+    }
+}
+
 class HMHViewYaml extends BaseComponent {
     constructor() {
         super('hmh-viewyaml');
@@ -128,7 +158,39 @@ class HMHViewYaml extends BaseComponent {
 
         // Run functionality (placeholder)
         runButton.addEventListener('click', () => {
-            console.log('TBD: Run functionality');
+            try{
+                let yamlObject = jsyaml.load(this.yaml);
+                
+                processYamlWorkflow(yamlObject)
+                .then(result => {
+                    console.log(JSON.stringify(result, null, 2));
+                    copyMessage.style.color = 'green';
+                    copyMessage.textContent = '✓ Executed Workflow Successfully';
+                    copyMessage.style.opacity = '1';
+                    setTimeout(() => {
+                        copyMessage.style.opacity = '0';
+                    }, 2000);
+                })
+                .catch(error => {
+                    console.error("Workflow Execution ",error);
+                    copyMessage.style.color = 'red';
+                    copyMessage.textContent = 'X Error Executing Workflow';
+                    copyMessage.style.opacity = '1';
+                    setTimeout(() => {
+                        copyMessage.style.opacity = '0';
+                    }, 2000);
+                });
+
+
+            } catch (e) {
+                console.error("Workflow Execution ",e);
+                copyMessage.style.color = 'red';
+                copyMessage.textContent = 'X Error Executing Workflow';
+                    copyMessage.style.opacity = '1';
+                    setTimeout(() => {
+                        copyMessage.style.opacity = '0';
+                    }, 2000);
+            }
         });
 
         // Close popup
@@ -164,7 +226,6 @@ class HMHViewYaml extends BaseComponent {
         yamlDisplay.textContent = content;
         popupOverlay.style.display = 'block';
     }
-
 }
 
 customElements.define('hmh-viewyaml', HMHViewYaml);
