@@ -30,7 +30,6 @@ def main():
     if args.command == 'init':
         init(args.file)
     elif args.command == 'run':
-        print(f"run {args.file}")
         run_workflow(args.file, args.toolsFile, args.debug)
     elif args.command == 'serve':
         serve(args.port, args.debug)
