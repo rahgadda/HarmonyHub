@@ -8,6 +8,8 @@ import yaml
 
 from src.hmh_exception import RestException
 
+debugMode = False
+
 # FastAPI instance
 app = FastAPI(
     title="YAML Workflow Processor",
@@ -38,7 +40,9 @@ async def root():
 
 # Run workflow endpoint
 @app.post("/run")
-async def serve_workflow(file: UploadFile, debugMode: bool = False):
+async def serve_workflow(file: UploadFile):
+
+    global debugMode 
     
     httpResponse = ()
     messageDetails = []
@@ -67,18 +71,19 @@ async def serve_workflow(file: UploadFile, debugMode: bool = False):
             )
 
         workflow = Workflow(yamlObject=yamlObject, debug_mode=debugMode)
-        workflow.record_headers()
-        if(debugMode):
-            messageDetails.append({
-                "type" : "header",
-                "details" : workflow.global_headers 
-            })
-
+        
         workflow.record_variables()
         if(debugMode):
             messageDetails.append({
                 "type" : "variables",
                 "details" : workflow.global_variables
+            })
+        
+        workflow.record_headers()
+        if(debugMode):
+            messageDetails.append({
+                "type" : "header",
+                "details" : workflow.global_headers 
             })
 
         steps = workflow.workflow_data.get('workflow', {}).get('steps')
@@ -120,6 +125,9 @@ async def serve_workflow(file: UploadFile, debugMode: bool = False):
     return httpResponse
 
 def serve(port: int, debugFlag: bool):
+    global debugMode 
+    
+    debugMode = debugFlag
     uvicorn.run(
         app,
         host="0.0.0.0",

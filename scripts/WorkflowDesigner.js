@@ -1,4 +1,5 @@
 import { Node } from "./Node.js";
+import { loadTools } from './load-tools.js';
 
 export class WorkflowDesigner {
     constructor(hmhCanvas, hmhCanvasContainer,bodyStyler) {
@@ -38,6 +39,13 @@ export class WorkflowDesigner {
 
         // Add keyboard event listener for delete
         this.setupKeyboardEvents();
+
+        // Load tools
+        loadTools().then(tools => {
+            this.tools = tools;
+        }).catch(error => {
+            console.error('Error loading tools:', error);
+        });
     }
 
     initializeProperties() {
@@ -180,15 +188,53 @@ export class WorkflowDesigner {
         }
     }
 
-    addIntegrationNodeToCanvas(x, y, name, type, svg, properties, headers, workflow) {
+    addIntegrationNodeToCanvas(x, y, name, type, svg, tool) {
         try{
+
+            let properties = [
+                {
+                    name: 'Tool Id',
+                    field: 'toolid',
+                    datatype: 'Text',
+                    required: true,
+                    hint: 'Enter Integration Tool ID',
+                    value: tool.id,
+                    readOnly: true
+                },
+                {
+                    name: 'Name',
+                    field: 'name',
+                    datatype: 'Text',
+                    required: 'true',
+                    hint: 'Enter value for Name',
+                    value: name,
+                    readOnly: false
+                }
+            ]
+
+            const variableProperty = tool.properties.find(prop => prop.field === 'variables');
+            if (variableProperty && variableProperty.value) {
+                for (let variable in variableProperty.value) {
+                    let var_name = variable.charAt(0).toUpperCase() + variable.slice(1)
+                    var_name = var_name.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())
+
+                    properties.push({
+                        name: var_name,
+                        field: variable,
+                        datatype: 'Text',
+                        required: false,
+                        hint: `Enter value for ${var_name}`,
+                        value: variableProperty.value[variable],
+                        readOnly: false
+                    });
+                }
+            }
+
             let node = this.addNodeToCanvas(x, y, name, type, svg, properties)
-
+            node.png = tool.png;
             node.group.customType = 'integration';
-            node.headers = headers;
-            node.workflow = workflow;
 
-            console.log("Integration Node added:", node);
+            // console.log("Integration Node added:", node);
 
             return node;
         }
@@ -196,6 +242,44 @@ export class WorkflowDesigner {
             console.error('Error in addIntegrationNodeToCanvas:', error);
             throw error;
         }
+    }
+
+    canvasToPNG(fabricCanvas) {
+        // Remove selection borders
+        fabricCanvas.discardActiveObject();
+        fabricCanvas.renderAll();
+        
+        // Get coordinates of content
+        const objects = fabricCanvas.getObjects();
+        if (!objects.length) return null;
+        
+        // Find boundaries of all objects
+        const bounds = objects.reduce((acc, obj) => {
+            const bound = obj.getBoundingRect();
+            return {
+                left: Math.min(acc.left, bound.left),
+                top: Math.min(acc.top, bound.top),
+                right: Math.max(acc.right, bound.left + bound.width),
+                bottom: Math.max(acc.bottom, bound.top + bound.height)
+            };
+        }, { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity });
+        
+        // Add small padding
+        const padding = 10;
+        bounds.left = Math.max(0, bounds.left - padding);
+        bounds.top = Math.max(0, bounds.top - padding);
+        bounds.right = Math.min(fabricCanvas.width, bounds.right + padding);
+        bounds.bottom = Math.min(fabricCanvas.height, bounds.bottom + padding);
+        
+        // Get base64 of trimmed area
+        return fabricCanvas.toDataURL({
+            format: 'png',
+            quality: 1,
+            left: bounds.left,
+            top: bounds.top,
+            width: bounds.right - bounds.left,
+            height: bounds.bottom - bounds.top
+        }).replace(/^data:image\/png;base64,/, '');
     }
 
     updateNodeText(node, text) {
@@ -391,6 +475,7 @@ export class WorkflowDesigner {
             name: this.properties[2].value,
             description: this.properties[3].value,
             svg: this.properties[4].value ? String.raw`${this.properties[4].value}` : undefined,
+            png: this.canvasToPNG(this.fabricCanvas),
             headers: Object.keys(this.properties[5].value).length ? this.properties[5].value : undefined,
             variables: Object.keys(this.properties[6].value).length ? this.properties[6].value : undefined,
             workflow: {
@@ -410,7 +495,7 @@ export class WorkflowDesigner {
                                           .replace(/- errorhandler:/g, '  errorhandler:')
                                         //   .replace(/- condition:(.*)/g, '  condition:$1');
         
-        console.log(yamlWithCorrectedKeys);  
+        // console.log(yamlWithCorrectedKeys);  
         return yamlWithCorrectedKeys;
     }
 
@@ -556,7 +641,47 @@ export class WorkflowDesigner {
             }
         });
         
-        steps.push(step);
+        if (node.getPropertyValue('type') === 'harmonyhub-integration') {
+            let new_step = {}
+            let toolId = node.getPropertyValue('toolid');
+
+            if (toolId === null || toolId === '') {
+                throw new Error(`Required field toolid is empty in Integration NodeID ${node.getPropertyValue("id")}`);
+            }else{
+                // console.log("toolid",toolId);
+                // console.log("tools",this.tools["Integration"]); 
+                const tool = this.tools["Integration"].find(t => t.id === parseInt(toolId));
+                // console.log("tool",tool);
+
+                if (tool === undefined) {
+                    throw new Error(`Invalid Tool ID ${toolId} in Integration NodeID ${node.getPropertyValue("id")}`);
+                }else{
+
+                    let old_variables = tool.properties.find(prop => prop.field === 'variables').value;
+                    let new_variables = {};
+
+                    for (let variable in old_variables) {
+                        // console.log("variable",variable);
+                        // console.log("old_variables[variable]",old_variables[variable]);
+                        // console.log("new value",node.getPropertyValue(variable));
+                        new_variables[variable] = node.getPropertyValue(variable);
+                    }
+
+                    new_step ={
+                        id: node.getPropertyValue('id'),
+                        type: node.getPropertyValue('type'),
+                        name: node.getPropertyValue('name'),
+                        toolid: node.getPropertyValue('toolid'),
+                        headers: tool.properties.find(prop => prop.field === 'headers').value,
+                        variables: new_variables,
+                        steps: tool.properties.find(prop => prop.field === 'steps').value,
+                    }
+                }
+                steps.push(new_step);
+            }
+        }else{
+            steps.push(step);
+        }
         return steps;
     }
     
@@ -640,9 +765,20 @@ export class WorkflowDesigner {
         });
 
         this.fabricCanvas.on('mouse:dblclick', (event) => {
-            document.dispatchEvent(new CustomEvent('canvas-selected', { 
-                detail: { canvas: this } 
-            }));
+            
+            if(!event.target){
+                document.dispatchEvent(new CustomEvent('canvas-selected', { 
+                    detail: { canvas: this } 
+                }));
+
+                
+                window.focusState.previous = window.focusState.current
+                window.focusState.current = "canvas"
+                window.focusState.selectedNode= null
+                window.focusState.selectedEdge = null
+                window.focusState.selectedCanvas = this
+                window.focusState.onPropertyPallet = false
+            }
         });
 
         // 2. Zoom canvas when mouse wheel is scrolled
@@ -735,6 +871,20 @@ export class WorkflowDesigner {
                 document.dispatchEvent(new CustomEvent('node-selected', { 
                     detail: { node: e.target?.data } 
                 }));
+            },
+            'mousedblclick': (e) => {
+                const node = e.target.data;
+                if (!node) return;
+                else{
+                    // console.log("Node Type",node.group.customType)
+                    if(node.group.customType == "integration")
+                    {
+                        document.dispatchEvent(new CustomEvent('show-image-popup', {
+                            detail: { nodeName: node.name, nodeImage: node.png }
+                        }));
+                        // console.log("Raised Event for ", node.name)
+                    }
+                }
             }
         });
     }
@@ -750,12 +900,26 @@ export class WorkflowDesigner {
                     detail: {canvas : this}
                 }));
 
+                window.focusState.previous = window.focusState.current
+                window.focusState.current = "canvas"
+                window.focusState.selectedNode= null
+                window.focusState.selectedEdge = null
+                window.focusState.selectedCanvas = null
+                window.focusState.onPropertyPallet = false
+
             }else if (e.key === 'Delete' && !window.focusState.onPropertyPallet && window.focusState.current === 'edge') {
                 
                 window.focusState.selectedEdge.deleteSelectedEdge(this.fabricCanvas);
                     document.dispatchEvent(new CustomEvent('deleted-attribute',{
                     detail: {canvas : this}
                 }));
+
+                window.focusState.previous = window.focusState.current
+                window.focusState.current = "canvas"
+                window.focusState.selectedNode= null
+                window.focusState.selectedEdge = null
+                window.focusState.selectedCanvas = null
+                window.focusState.onPropertyPallet = false
             }
             else if (e.key === 's' && e.ctrlKey) {
                 e.preventDefault();

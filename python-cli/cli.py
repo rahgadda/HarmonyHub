@@ -8,7 +8,7 @@ def main():
     subparsers = parser.add_subparsers(dest='command')
 
     # Version
-    parser.add_argument('--version', action='version', version='%(prog)s 0.0.1')
+    parser.add_argument('--version', action='version', version='%(prog)s 0.0.6')
 
     # Init Command
     init_parser = subparsers.add_parser('init', help='Initialize a basic workflow YAML file')   
@@ -17,6 +17,7 @@ def main():
     # Run Command
     run_parser = subparsers.add_parser('run', help='Run the workflow from a YAML file')
     run_parser.add_argument('file', type=str, help='Path to the workflow YAML file')
+    run_parser.add_argument('--toolsFile', type=str, help='Path of tools library YAML file')
     run_parser.add_argument('--debug', action='store_true', help='Enable debug mode for detailed output')
 
     # Serve Command
@@ -30,7 +31,7 @@ def main():
         init(args.file)
     elif args.command == 'run':
         print(f"run {args.file}")
-        run_workflow(args.file, args.debug)
+        run_workflow(args.file, args.toolsFile, args.debug)
     elif args.command == 'serve':
         serve(args.port, args.debug)
     elif args.command == 'help':

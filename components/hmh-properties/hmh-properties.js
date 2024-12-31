@@ -5,11 +5,15 @@ class HMHProperties extends BaseComponent {
     constructor() {
         super('hmh-properties');
         this.propertiesContent = null
+        this.isScrolling = false;
+        this.lastY = 0;
+        this.scrollTop = 0;
     }
 
     async connectedCallback() {
         const shadowRoot = await super.connectedCallback();
         this.propertiesContent = shadowRoot.getElementById('propertiesContent');
+        this.setupScrollHandlers(shadowRoot);
 
         // Load properties
         document.addEventListener('node-selected', (event) => {
@@ -26,8 +30,7 @@ class HMHProperties extends BaseComponent {
                 onPropertyPallet: false
             };
             this.displayNone();
-            if (node)
-                this.displayProperties(node, 'node');
+            this.displayProperties(node, node.group.customType);
         });
 
         document.addEventListener('canvas-selected', (event) => {
@@ -90,6 +93,36 @@ class HMHProperties extends BaseComponent {
         });
     }
 
+    setupScrollHandlers(shadowRoot) {
+        const container = shadowRoot.querySelector('.hmh-properties');
+
+        container.addEventListener('mousedown', (e) => {
+            this.isScrolling = true;
+            this.lastY = e.clientY;
+            this.scrollTop = container.scrollTop;
+            container.style.cursor = 'grabbing';
+        });
+
+        container.addEventListener('mousemove', (e) => {
+            if (!this.isScrolling) return;
+            
+            const delta = this.lastY - e.clientY;
+            container.scrollTop = this.scrollTop + delta;
+            
+            // Prevent text selection while scrolling
+            e.preventDefault();
+        });
+
+        // Handle mouse up and mouse leave
+        const stopScrolling = () => {
+            this.isScrolling = false;
+            container.style.cursor = '';
+        };
+
+        container.addEventListener('mouseup', stopScrolling);
+        container.addEventListener('mouseleave', stopScrolling);
+    }
+
     displayNone(){
         this.propertiesContent.innerHTML =`
         <p>Select to edit properties</p>`;
@@ -141,6 +174,12 @@ class HMHProperties extends BaseComponent {
                     break;
                 case 'Enumeration':
                     this.propertiesContent.innerHTML += this.createSelectInput(property.name, property.options, property.value, property.hint, property.readOnly);
+                    break;
+                case 'SVG':
+                    this.propertiesContent.innerHTML += this.createSVGViewBox(property.name, Object.keys(property.value).length !== 0 ? JSON.stringify(property.value, null, 2) : '', property.hint, property.readOnly);
+                    break;
+                case 'PNG':
+                    this.propertiesContent.innerHTML += this.createBase64PngViewBox(property.name, property.value, property.hint, property.readOnly);
                     break;
                 case 'Array':
                     this.propertiesContent.innerHTML += this.createTextArea(property.name, property.value.join(',\n'), property.hint, property.readOnly);
@@ -272,6 +311,32 @@ class HMHProperties extends BaseComponent {
             </div>
         `;
     }
+
+    // createSVGViewBox(label, value, hint, readOnly = false) {
+    //     value = value.replace(/^"|"$/g, '');
+    //     value = value.replace(/\\n/g, '\n');
+    //     value = value.replace(/\\/g, '');
+    //     // console.log('Property '+label+' is getting loaded as '+value);
+
+    //     return `
+    //         <div class="property">
+    //             <label>${label}</label>
+    //             <div ${readOnly ? 'readonly' : ''} title="${hint || ''}">
+    //                 ${value}
+    //             </div>
+    //         </div>
+    //     `;
+        
+    // }
+
+    // createBase64PngViewBox(label, value, hint, readOnly = false) {
+    //     return `
+    //         <div class="property">
+    //             <label>${label}</label>
+    //             <img src="data:image/png;base64,${value}" alt="${hint || label}" ${readOnly ? 'readonly' : ''}>
+    //         </div>
+    //     `;
+    // }
 }
 
 customElements.define('hmh-properties', HMHProperties);

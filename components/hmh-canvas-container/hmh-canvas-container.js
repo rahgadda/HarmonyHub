@@ -28,8 +28,11 @@ class HMHCanvas extends BaseComponent {
             const centerX = hmhCanvas.width / 2;
 
             try {
+
                 // Convert SVG string to path data
                 const svg = e.detail.tool.svg;
+
+                // console.log("Tool ",e.detail.tool)
                 
                 if (e.detail.tool.type !== "harmonyhub-integration"){
                     this.workflowDesigner.addNodeToCanvas(
@@ -47,9 +50,7 @@ class HMHCanvas extends BaseComponent {
                         e.detail.tool.description,
                         e.detail.tool.type,
                         svg,
-                        e.detail.tool.properties,
-                        e.detail.tool.headers,
-                        e.detail.tool.workflow
+                        e.detail.tool
                     );
                 }
 

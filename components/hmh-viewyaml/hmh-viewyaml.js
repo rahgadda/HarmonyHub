@@ -33,6 +33,7 @@ async function processYamlWorkflow(yamlObject) {
 class HMHViewYaml extends BaseComponent {
     constructor() {
         super('hmh-viewyaml');
+        this.sourceYaml = '';
         this.yaml = '';
     }
 
@@ -45,8 +46,11 @@ class HMHViewYaml extends BaseComponent {
         // YAML show event
         document.addEventListener('show-yaml', (e) => {
             if (e.detail?.yaml) {
-                this.yaml = e.detail.yaml;
-                this.displayYaml(shadowRoot, e.detail.yaml);
+                this.sourceYaml = e.detail.yaml;
+                let yamlObject = jsyaml.load(this.sourceYaml);
+                delete yamlObject.png;
+                this.yaml = jsyaml.dump(yamlObject);
+                this.displayYaml(shadowRoot, this.yaml);
             }
         });
     }
@@ -86,11 +90,11 @@ class HMHViewYaml extends BaseComponent {
         // Export functionality
         exportButton.addEventListener('click', () => {
             // console.log('Yaml:', this.yaml);
-            let yamlObject = jsyaml.load(this.yaml);
+            let yamlObject = jsyaml.load(this.sourceYaml);
            
             let exportYamlObject = {};
 
-            console.log(yamlObject.variables);
+            // console.log(yamlObject.variables);
 
             let objectName = yamlObject.name.charAt(0).toUpperCase() + yamlObject.name.slice(1);
 
@@ -99,6 +103,7 @@ class HMHViewYaml extends BaseComponent {
                 type: "harmonyhub-integration",
                 description: yamlObject.description,
                 svg: yamlObject.svg,
+                png: yamlObject.png,
                 category: "Integration",
                 properties: [{
                     name: 'Name',
@@ -145,7 +150,7 @@ class HMHViewYaml extends BaseComponent {
                 readOnly: false 
             });
 
-            console.log(jsyaml.dump(exportYamlObject));
+            // console.log(jsyaml.dump(exportYamlObject));
 
             const blob = new Blob([jsyaml.dump(exportYamlObject)], {type: 'text/yaml'});
             const url = URL.createObjectURL(blob);

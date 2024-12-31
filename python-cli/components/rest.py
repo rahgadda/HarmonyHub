@@ -10,14 +10,28 @@ import random
 from src.hmh_exception import RestException
 
 # Record Headers
-def record_headers(flow):
+def record_headers(self, flow=None, global_variables=None, logging=None):
     try:
+        if flow is None:
+            flow = self.workflow_data
+
         headers = flow.get('headers', {})
-        if not isinstance(headers, dict):
-            raise RestException(0,"Error: 'headers' must be a dictionary.")
+
+        if not headers:
+            return {}
+        elif not isinstance(headers, dict):
+            raise Exception("Error: 'headers' must be a dictionary.")
+
+        # Replace header values with global variables if they exist
+        for key, value in headers.items():
+            if isinstance(value, str):
+                headers[key] = self.replace_variables(headers[key], global_variables, logging)
+                    
+        logging.debug(f"Added Headers: {headers}")
+
         return headers
     except Exception as e:
-        raise RestException(1,f"An error occurred while extracting headers: {e}")
+        raise Exception(f"An error occurred while extracting headers: {e}")
 
 # Record Variables
 def record_variables(flow):
@@ -144,8 +158,8 @@ def run_rest_flow(step, messageDetails, debugMode, global_headers, global_variab
             url = replace_variables(url, global_variables, logging)
 
         # -- Headers
-        step_headers = record_headers(step)
-        total_headers = {**global_headers, **step_headers}
+        step_headers = record_headers(step, global_variables, logging) or {}
+        total_headers = {**(global_headers or {}), **(step_headers or {})}
 
         # -- Body
         body = None
@@ -256,6 +270,10 @@ def run_rest_flow(step, messageDetails, debugMode, global_headers, global_variab
                 logging.info("#### Execute Tests #####")
             for test_case in test_cases:
                 test_values = execute_test_case(test_case, test_values, total_variables, logging)
+                messageDetails.append({
+                    "type" : "test",
+                    "details" : test_values
+                })
 
         return output_variables,messageDetails
 

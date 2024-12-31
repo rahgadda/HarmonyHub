@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='harmonyhub-cli',
-    version='0.0.5',
+    version='0.0.6',
     packages=find_packages(),
     install_requires=[
         'jq==1.8.0',

@@ -1,5 +1,6 @@
 // Array of component script files
 const componentFiles = [
+    '../components/hmh-imagepopup/hmh-imagepopup.js',
     '../components/hmh-hamburger/hmh-hamburger.js',
     '../components/hmh-canvas-container/hmh-canvas-container.js',
     '../components/hmh-tool-search/hmh-tool-search.js',
