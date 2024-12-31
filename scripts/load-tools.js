@@ -23,7 +23,8 @@ export async function loadTools() {
           category: config.category,
           properties: config.properties,
           headers: config.type === "harmonyhub-integration" ? config.headers : null,
-          workflow: config.type === "harmonyhub-integration" ? config.workflow : null
+          workflow: config.type === "harmonyhub-integration" ? config.workflow : null,
+          png: config.type === "harmonyhub-integration" ? config.png : null
         });
       }
     } catch (error) {
