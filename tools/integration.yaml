@@ -23,7 +23,7 @@ OpenAITool:
       hint: Enter OpenAI Headers {}
       value:
         Content-Type: application/json
-        Authorization: Bearer Enter Token
+        Authorization: Bearer enter token value
       readOnly: false
     - name: Variables
       field: variables
@@ -32,6 +32,7 @@ OpenAITool:
       hint: Enter OpenAI Variables {}
       value:
         openai_url: https://api.openai.com/v1/chat/completions
+        prompt: what is your name
       readOnly: false
     - name: Steps
       field: steps
@@ -50,7 +51,7 @@ OpenAITool:
                 "model": "gpt-3.5-turbo-0125",
                 "messages": [
                   {"role": "system", "content": "You are a helpful assistant."},
-                  {"role": "user", "content": "Hello! Can you help me with something?"}
+                  {"role": "user", "content": "{{prompt}}"}
                 ],
                 "max_tokens": 100,
                 "temperature": 0.7
@@ -62,16 +63,18 @@ OpenAITool:
       readOnly: false
 
 GroqTool:
-  id: 6
+  id: 5
   type: harmonyhub-integration
   description: Groq
-  svg: >
+  svg: >-
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
     fill="currentColor">
       <text x="12" y="12" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="bold">
         Groq
       </text>
     </svg>
+  png: >-
+    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
   category: Integration
   properties:
     - name: Name
@@ -88,7 +91,7 @@ GroqTool:
       hint: Enter Groq Headers {}
       value:
         Content-Type: application/json
-        Authorization: Bearer Enter Token
+        Authorization: $auth
       readOnly: false
     - name: Variables
       field: variables
@@ -96,9 +99,10 @@ GroqTool:
       required: false
       hint: Enter Groq Variables {}
       value:
+        auth: Bearer enter token value
         url: https://api.groq.com/openai/v1/chat/completions
         model: llama3-8b-8192
-        question: what are language models?
+        prompt: what are language models?
       readOnly: false
     - name: Steps
       field: steps
@@ -117,11 +121,114 @@ GroqTool:
               "model": "{{model}}",
               "messages": [{
                   "role": "user",
-                  "content": "{{question}}"
+                  "content": "{{prompt}}"
               }]
             }
           outputs:
             llm_response: .response_body.choices[0].message.content
           prints:
+            - $llm_response
+      readOnly: false
+
+GeminiTool:
+  id: 7
+  type: harmonyhub-integration
+  description: Gemini
+  svg: "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\">\n\t<path fill=\"currentColor\" d=\"M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68q.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58a12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68q-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96q2.19.93 3.81 2.55t2.55 3.81\" />\n</svg>"
+  png: >-
+    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
+  category: Integration
+  properties:
+    - name: Name
+      field: name
+      datatype: Text
+      required: true
+      hint: Enter value for Name
+      value: Gemini
+      readOnly: false
+    - name: Headers
+      field: headers
+      datatype: Object
+      required: false
+      hint: Enter Gemini Headers {}
+      value:
+        Content-Type: application/json
+        Authorization: Bearer $api_key
+      readOnly: false
+    - name: Variables
+      field: variables
+      datatype: Object
+      required: false
+      hint: Enter Gemini Variables {}
+      value:
+        api_endpoint: us-central1-aiplatform.googleapis.com
+        project_id: user-entervalue
+        location_id: us-central1
+        model_id: gemini-2.0-flash-exp
+        generate_content_api: generateContent
+        api_key: enter token value
+        prompt: what is your name?
+      readOnly: false
+    - name: Steps
+      field: steps
+      datatype: ArrayObject
+      required: true
+      hint: Enter Gemini for Steps
+      value:
+        - id: '1'
+          type: restapi
+          name: Google Gemini
+          http:
+            method: POST
+            url: >-
+              https://$api_endpoint/v1/projects/$project_id/locations/$location_id/publishers/google/models/$model_id:$generate_content_api
+          data: |-
+            {
+                "contents": [
+                    {
+                        "role": "user",
+                        "parts": [
+                            {
+                                "text": "{{prompt}}"
+                            }
+                        ]
+                    }
+                ]
+                ,"systemInstruction":{
+                    "parts": [
+                        {
+                            "text": "You are an AI assistant that generates a detailed research analysis based on the provided context."
+                        }
+                    ]
+                }, 
+                "generationConfig": {
+                    "responseModalities": ["TEXT"]
+                    ,"temperature": 1
+                    ,"maxOutputTokens": 8192
+                    ,"topP": 0.95
+                },
+                "safetySettings": [
+                    {
+                        "category": "HARM_CATEGORY_HATE_SPEECH",
+                        "threshold": "OFF"
+                    },
+                    {
+                        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                        "threshold": "OFF"
+                    },
+                    {
+                        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                        "threshold": "OFF"
+                    },
+                    {
+                        "category": "HARM_CATEGORY_HARASSMENT",
+                        "threshold": "OFF"
+                    }
+                ]
+            }
+          outputs:
+            llm_response: .response_body.candidates[0].content.parts[0].text
+          prints:
+            - $response_body
             - $llm_response
       readOnly: false

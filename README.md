@@ -9,7 +9,8 @@
 - harmonyhub-cli init
   - harmonyhub-cli init --file workflow.yaml
 - harmonyhub_cli run <<workflow.yaml>>
-  - pyyaml2apiworkflow run <<workflow.yaml>> --debug
+  - harmonyhub-cli run <<workflow.yaml>> --debug
+  - harmonyhub-cli run <<workflow.yaml>> --toolsFile <<integration.yaml>> --debug
 - harmonyhub-cli server
 - harmonyhub-cli --help
 - harmonyhub-cli --version
@@ -44,12 +45,17 @@
   - $response_body
 
 ## Roadmap
+- Kafka
 - GraphQL
 - Grpc
-- Kafka
 
 ## Demo
-- Demo created [here](https://app.beeceptor.com/console/automation-demo)
+- Demo created [here](https://rahulkirangaddam.is-a.dev/HarmonyHub/)
+  ```bash
+  # https://pypi.org/project/harmonyhub-cli/
+  pip install harmonyhub-cli/
+  harmonyhub-cli serve
+  ```
 
 ## Credits
 - Below are projects used as inspiration
