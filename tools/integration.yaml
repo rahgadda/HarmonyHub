@@ -32,7 +32,7 @@ OpenAITool:
       hint: Enter OpenAI Variables {}
       value:
         openai_url: https://api.openai.com/v1/chat/completions
-        api_key: enter api key
+        api_key: Enter API Key
         prompt: what is your name
       readOnly: false
     - name: Steps
@@ -92,7 +92,7 @@ GroqTool:
       hint: Enter Groq Headers {}
       value:
         Content-Type: application/json
-        Authorization: $api_key
+        Authorization: Bearer $api_key
       readOnly: false
     - name: Variables
       field: variables
@@ -100,7 +100,7 @@ GroqTool:
       required: false
       hint: Enter Groq Variables {}
       value:
-        api_key: Bearer enter token value
+        api_key: Enter API Key
         url: https://api.groq.com/openai/v1/chat/completions
         model: llama3-8b-8192
         prompt: what are language models?
@@ -167,7 +167,7 @@ GeminiTool:
         location_id: us-central1
         model_id: gemini-2.0-flash-exp
         generate_content_api: generateContent
-        api_key: enter api key
+        api_key: Enter API Key
         prompt: what is your name?
       readOnly: false
     - name: Steps
