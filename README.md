@@ -56,6 +56,10 @@
   pip install harmonyhub-cli/
   harmonyhub-cli serve
   ```
+  ```bash
+  # To run yaml generated standalone
+  harmonyhub-cli <<file name.yaml>>
+  ```
 
 ## Credits
 - Below are projects used as inspiration
